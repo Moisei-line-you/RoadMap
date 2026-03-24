@@ -29,7 +29,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Data\Migrations\" />
+      <ProjectReference Include="..\RoadMap.Application\RoadMap.Application.csproj" />
+      <ProjectReference Include="..\RoadMap.Domain\RoadMap.Domain.csproj" />
+      <ProjectReference Include="..\RoadMap.Infrastucture\RoadMap.Infrastucture.csproj" />
     </ItemGroup>
 
 </Project>
