@@ -1,0 +1,7 @@
+﻿services:
+  roadmap:
+    image: roadmap
+    build:
+      context: .
+      dockerfile: RoadMap/Dockerfile
+

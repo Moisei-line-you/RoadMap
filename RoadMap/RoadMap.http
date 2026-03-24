@@ -1,0 +1,6 @@
+@RoadMap_HostAddress = http://localhost:5177
+
+GET {{RoadMap_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
