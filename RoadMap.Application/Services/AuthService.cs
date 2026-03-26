@@ -1,12 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using RoadMap.Application.DTO.Auth;
+using RoadMap.Application.Exceptions;
 using RoadMap.Application.Interfaces;
 using RoadMap.Models.Users;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using RoadMap.Data;
 
 namespace RoadMap.Application.Services;
@@ -14,18 +10,20 @@ namespace RoadMap.Application.Services;
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
-    private readonly IConfiguration _configuration;
+    private readonly ITokenService _tokenService; 
 
-    public AuthService(AppDbContext context, IConfiguration configuration)
+    public AuthService(AppDbContext context, ITokenService tokenService)
     {
         _context = context;
-        _configuration = configuration;
+        _tokenService = tokenService;
     }
-
-    public async Task<string> RegisterAsync(RegisterDto dto)
+    
+    public async Task RegisterAsync(RegisterDto dto) 
     {
         if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
-            return "Email already exists";
+        {
+            throw new EmailAlreadyExistsException();
+        }
 
         string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
@@ -39,8 +37,6 @@ public class AuthService : IAuthService
         
         _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
-
-        return "Register successful";
     }
 
     public async Task<TokenResponseDto> LoginAsync(LoginDto dto)
@@ -49,36 +45,14 @@ public class AuthService : IAuthService
 
         if (user == null  || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
         {
-            return null;
+            throw new InvalidCredentialsException();
         }
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-
-        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
-
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim("RoleId", user.RoleId.ToString()),
-        };
-
-        var tokenDescription = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(7),
-            Issuer = _configuration["Jwt:Issuer"],
-            Audience = _configuration["Jwt:Audience"],
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
         
-        var token = tokenHandler.CreateToken(tokenDescription);
+        var token = _tokenService.GenerateJwtToken(user);
 
         return new TokenResponseDto
         {
-            Token = tokenHandler.WriteToken(token)
+            Token = token
         };
     }
 }
-
