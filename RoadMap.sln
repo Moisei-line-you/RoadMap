@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadMap.Application", "Road
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadMap.Domain", "RoadMap.Domain\RoadMap.Domain.csproj", "{2D6C62A8-62F5-489A-A469-A46129DB3DC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadMap.Infrastucture", "RoadMap.Infrastucture\RoadMap.Infrastucture.csproj", "{1D0DB673-DFF4-4867-BE51-5EACC17F8F2E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadMap.Infrastructure", "RoadMap.Infrastructure\RoadMap.Infrastructure.csproj", "{1D0DB673-DFF4-4867-BE51-5EACC17F8F2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
