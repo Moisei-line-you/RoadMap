@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RoadMap.Application.DTO.Auth;
+using RoadMap.Application.DTOs.Auth;
 using RoadMap.Application.Exceptions;       
 using RoadMap.Application.Interfaces;
 

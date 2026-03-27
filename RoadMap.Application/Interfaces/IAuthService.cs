@@ -1,4 +1,4 @@
-using RoadMap.Application.DTO.Auth;
+using RoadMap.Application.DTOs.Auth;
 
 namespace RoadMap.Application.Interfaces;
 

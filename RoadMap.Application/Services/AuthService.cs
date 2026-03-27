@@ -1,6 +1,7 @@
-using RoadMap.Application.DTO.Auth;
+using RoadMap.Application.DTOs.Auth;
 using RoadMap.Application.Exceptions;
 using RoadMap.Application.Interfaces;
+using RoadMap.Domain.Interfaces;
 using RoadMap.Models.Users;
 
 namespace RoadMap.Application.Services;
@@ -25,8 +26,8 @@ public class AuthService : IAuthService
 
         var newUser = CreateUser(dto);
         
-        _userRepository.AddUsers(newUser);
         await _userRepository.AddUserAsync(newUser);
+        await _userRepository.SaveChangesAsync();
     }
 
     public async Task<TokenResponseDto> LoginAsync(LoginDto dto)

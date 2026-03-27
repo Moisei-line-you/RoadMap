@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RoadMap.Application.DTO.Auth;
+namespace RoadMap.Application.DTOs.Auth;
 
 public class LoginDto
 {

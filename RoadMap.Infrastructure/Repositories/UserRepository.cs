@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using RoadMap.Application.Interfaces;
 using RoadMap.Data;
+using RoadMap.Domain.Interfaces;
 using RoadMap.Models.Users;
 
-namespace RoadMap.Application.Repositories;
+namespace RoadMap.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
@@ -26,13 +26,7 @@ public class UserRepository : IUserRepository
     
     public async Task AddUserAsync(User user)
     {
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-    }
-
-    public void AddUsers(User user)
-    {
-        _context.Users.Add(user);
+        await _context.Users.AddAsync(user);
     }
     
     public async Task SaveChangesAsync()

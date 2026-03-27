@@ -1,14 +1,14 @@
-using Microsoft.EntityFrameworkCore;
-using RoadMap.Application.Interfaces;
-using RoadMap.Application.Services;
-using RoadMap.Data;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RoadMap.Application.Interfaces;
 using RoadMap.Application.Options;
-using RoadMap.Application.Repositories;
-
+using RoadMap.Application.Services;
+using RoadMap.Data;
+using RoadMap.Domain.Interfaces;
+using RoadMap.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

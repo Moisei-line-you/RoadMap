@@ -1,4 +1,4 @@
-namespace RoadMap.Application.DTO.Auth;
+namespace RoadMap.Application.DTOs.Auth;
 
 public class TokenResponseDto
 {
