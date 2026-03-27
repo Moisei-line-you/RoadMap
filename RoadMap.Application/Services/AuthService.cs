@@ -9,18 +9,18 @@ namespace RoadMap.Application.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly AppDbContext _context;
-    private readonly ITokenService _tokenService; 
+    private readonly IUserRepository _userRepository;
+    private readonly ITokenService _tokenService;
 
-    public AuthService(AppDbContext context, ITokenService tokenService)
+    public AuthService(IUserRepository userRepository, ITokenService tokenService)
     {
-        _context = context;
+        _userRepository = userRepository;
         _tokenService = tokenService;
     }
     
     public async Task RegisterAsync(RegisterDto dto) 
     {
-        if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+        if (await _userRepository.EmailExistsAsync(dto.Email))
         {
             throw new EmailAlreadyExistsException();
         }
@@ -35,13 +35,12 @@ public class AuthService : IAuthService
             RoleId = 1
         };
         
-        _context.Users.Add(newUser);
-        await _context.SaveChangesAsync();
+        await _userRepository.AddUserAsync(newUser);
     }
 
     public async Task<TokenResponseDto> LoginAsync(LoginDto dto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+        var user = await _userRepository.GetByUsernameAsync(dto.Username);
 
         if (user == null  || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
         {
