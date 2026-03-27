@@ -2,8 +2,6 @@ using RoadMap.Application.DTO.Auth;
 using RoadMap.Application.Exceptions;
 using RoadMap.Application.Interfaces;
 using RoadMap.Models.Users;
-using Microsoft.EntityFrameworkCore;
-using RoadMap.Data;
 
 namespace RoadMap.Application.Services;
 
@@ -25,16 +23,9 @@ public class AuthService : IAuthService
             throw new EmailAlreadyExistsException();
         }
 
-        string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-
-        var newUser = new User
-        {
-            Username = dto.Username,
-            Email = dto.Email,
-            PasswordHash = passwordHash,
-            RoleId = 1
-        };
+        var newUser = CreateUser(dto);
         
+        _userRepository.AddUsers(newUser);
         await _userRepository.AddUserAsync(newUser);
     }
 
@@ -47,11 +38,21 @@ public class AuthService : IAuthService
             throw new InvalidCredentialsException();
         }
         
-        var token = _tokenService.GenerateJwtToken(user);
-
         return new TokenResponseDto
         {
-            Token = token
+            Token = _tokenService.GenerateJwtToken(user)
         };
     }
+
+    private User CreateUser(RegisterDto dto)
+    {
+        return new User
+        {
+            Username = dto.Username,
+            Email = dto.Email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            RoleId = 1
+        };
+    }
+    
 }
