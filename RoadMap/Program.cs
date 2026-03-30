@@ -8,7 +8,7 @@ using RoadMap.Application.Options;
 using RoadMap.Application.Services;
 using RoadMap.Data;
 using RoadMap.Domain.Interfaces;
-using RoadMap.Domain.Models.Roadmaps;
+using RoadMap.Domain.Services;
 using RoadMap.Infrastucture.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +31,13 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<INodeRepository, NodeRepository>();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
+
+builder.Services.AddScoped<INodeService, NodeService>();
+builder.Services.AddScoped<IRoadmapService, RoadmapService>();
+builder.Services.AddScoped<IDependencyGraphService, DependencyGraphService>();
+builder.Services.AddScoped<INodeRepository, NodeRepository>();
+builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
+builder.Services.AddScoped<IRepository, Repository>();
 
 builder.Services.AddSwaggerGen(c =>
 {

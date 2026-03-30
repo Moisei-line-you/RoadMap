@@ -1,6 +1,6 @@
 using RoadMap.Application.DTOs.Auth;
-using RoadMap.Application.Exceptions;
 using RoadMap.Application.Interfaces;
+using RoadMap.Domain.Exceptions;
 using RoadMap.Domain.Interfaces;
 using RoadMap.Models.Users;
 
