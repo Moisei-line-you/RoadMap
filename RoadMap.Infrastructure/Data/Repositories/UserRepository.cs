@@ -3,7 +3,7 @@ using RoadMap.Data;
 using RoadMap.Domain.Interfaces;
 using RoadMap.Models.Users;
 
-namespace RoadMap.Infrastructure.Repositories;
+namespace RoadMap.Infrastucture.Data.Repositories;
 
 public class UserRepository : IUserRepository
 {
