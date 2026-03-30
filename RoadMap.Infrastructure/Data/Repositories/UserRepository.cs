@@ -3,7 +3,7 @@ using RoadMap.Data;
 using RoadMap.Domain.Interfaces;
 using RoadMap.Models.Users;
 
-namespace RoadMap.Infrastructure.Repositories;
+namespace RoadMap.Infrastucture.Data.Repositories;
 
 public class UserRepository : IUserRepository
 {
@@ -22,11 +22,6 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByUsernameAsync(string username)
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-    }
-    
-    public async Task AddUserAsync(User user)
-    {
-        await _context.Users.AddAsync(user);
     }
     
     public async Task SaveChangesAsync()
