@@ -8,31 +8,31 @@ namespace RoadMap.Application.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IRepository _repository;
     private readonly ITokenService _tokenService;
 
-    public AuthService(IUserRepository userRepository, ITokenService tokenService)
+    public AuthService(IRepository repository, ITokenService tokenService)
     {
-        _userRepository = userRepository;
+        _repository = repository;
         _tokenService = tokenService;
     }
     
     public async Task RegisterAsync(RegisterDto dto) 
     {
-        if (await _userRepository.EmailExistsAsync(dto.Email))
+        if (await _repository.Users.EmailExistsAsync(dto.Email))
         {
             throw new EmailAlreadyExistsException();
         }
 
         var newUser = CreateUser(dto);
         
-        await _userRepository.AddUserAsync(newUser);
-        await _userRepository.SaveChangesAsync();
+        await _repository.AddAsync(newUser);
+        await _repository.SaveChangesAsync();
     }
 
     public async Task<TokenResponseDto> LoginAsync(LoginDto dto)
     {
-        var user = await _userRepository.GetByUsernameAsync(dto.Username);
+        var user = await _repository.Users.GetByUsernameAsync(dto.Username);
 
         if (user == null  || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
         {

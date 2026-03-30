@@ -6,4 +6,10 @@ public interface IRepository
     INodeRepository Nodes { get; }
     IUserRepository Users { get; }
     Task<int> SaveChangesAsync();
+    
+    Task AddAsync<TEntity>(TEntity entity)
+        where TEntity : class;
+
+    void Delete<TEntity>(TEntity entity)
+        where TEntity : class;
 }

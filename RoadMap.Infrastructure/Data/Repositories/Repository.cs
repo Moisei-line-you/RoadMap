@@ -18,4 +18,11 @@ public class Repository(
     {
         return await context.SaveChangesAsync();
     }
+
+    public async Task AddAsync<TEntity>(TEntity entity)
+        where TEntity : class =>
+        await context.Set<TEntity>().AddAsync(entity);
+
+    public void Delete<TEntity>(TEntity entity) where TEntity : class
+        => context.Set<TEntity>().Remove(entity);
 }

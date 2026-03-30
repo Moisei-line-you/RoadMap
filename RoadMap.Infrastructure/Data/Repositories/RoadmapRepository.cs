@@ -24,7 +24,4 @@ public class RoadmapRepository(AppDbContext context) : IRoadmapRepository
         return await context.RoadmapNodes
             .FirstOrDefaultAsync(rn => rn.RoadmapId == roadmapId && rn.NodeId == nodeId);
     }
-
-    public void Add(Roadmap entity) => context.Roadmaps.Add(entity);
-    public void Remove(Roadmap entity) => context.Roadmaps.Remove(entity);
 }

@@ -8,6 +8,4 @@ public interface IRoadmapRepository
     Task<RoadmapNode?> GetRoadmapNodeAsync(int roadmapId, int nodeId);
     Task<Roadmap?> GetAsync(int id);
     Task<IEnumerable<Roadmap>> GetAllAsync();
-    void Add(Roadmap roadmap);
-    void Remove(Roadmap roadmap);
 }

@@ -11,6 +11,4 @@ public interface INodeRepository
     void AddResourceLink(NodeResource nodeResource);
     Task<Node?> GetAsync(int id);
     Task<IEnumerable<Node>> GetAllAsync();
-    void Add(Node node);
-    void Remove(Node node);
 }

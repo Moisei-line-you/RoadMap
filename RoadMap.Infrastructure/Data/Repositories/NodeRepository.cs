@@ -27,7 +27,4 @@ public class NodeRepository(AppDbContext context) : INodeRepository
     public void RemoveDependency(NodeDependency dependency) => context.NodeDependencies.Remove(dependency);
 
     public void AddResourceLink(NodeResource nodeResource) => context.NodeResources.Add(nodeResource);
-
-    public void Add(Node entity) => context.Nodes.Add(entity);
-    public void Remove(Node entity) => context.Nodes.Remove(entity);
 }
