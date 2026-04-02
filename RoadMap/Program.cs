@@ -1,4 +1,5 @@
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,7 +9,6 @@ using RoadMap.Application.Options;
 using RoadMap.Application.Services;
 using RoadMap.Data;
 using RoadMap.Domain.Interfaces;
-using RoadMap.Domain.Models.Roadmaps;
 using RoadMap.Infrastucture.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,11 +22,21 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddScoped<IUserRepository, UserRepository>(); 
-
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddValidatorsFromAssembly(typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly);
+
+builder.Services.AddMediatR(cfg => 
+{
+    cfg.RegisterServicesFromAssemblies(
+        typeof(Program).Assembly, 
+        typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly
+    );
+    
+    cfg.AddOpenBehavior(typeof(RoadMap.Application.Common.Behaviors.ValidationBehavior<,>));
+});
 
 builder.Services.AddScoped<INodeRepository, NodeRepository>();
 builder.Services.AddScoped<IRepository, Repository>();
@@ -55,9 +65,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -78,6 +85,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 var app = builder.Build();
 
+app.UseMiddleware<RoadMap.Middleware.ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -85,7 +94,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
