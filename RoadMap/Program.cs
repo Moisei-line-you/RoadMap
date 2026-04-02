@@ -1,8 +1,11 @@
+using MediatR;
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RoadMap.Application.Common.Behaviors;
 using RoadMap.Application.Interfaces;
 using RoadMap.Application.Options;
 using RoadMap.Application.Services;
@@ -21,11 +24,17 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddScoped<IUserRepository, UserRepository>(); 
-
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddValidatorsFromAssembly(typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly);
+
+builder.Services.AddMediatR(cfg => 
+    cfg.RegisterServicesFromAssemblies(
+        typeof(Program).Assembly, 
+        typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly
+    ));
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -50,9 +59,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -73,6 +79,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 var app = builder.Build();
 
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -80,7 +87,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
