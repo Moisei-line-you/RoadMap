@@ -1,17 +1,15 @@
 using System.Text;
 using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using RoadMap.Application.Common.Behaviors;
 using RoadMap.Application.Interfaces;
 using RoadMap.Application.Options;
 using RoadMap.Application.Services;
 using RoadMap.Data;
 using RoadMap.Domain.Interfaces;
-using RoadMap.Infrastructure.Repositories;
+using RoadMap.Infrastucture.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +37,10 @@ builder.Services.AddMediatR(cfg =>
     
     cfg.AddOpenBehavior(typeof(RoadMap.Application.Common.Behaviors.ValidationBehavior<,>));
 });
+
+builder.Services.AddScoped<INodeRepository, NodeRepository>();
+builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
 
 builder.Services.AddSwaggerGen(c =>
 {

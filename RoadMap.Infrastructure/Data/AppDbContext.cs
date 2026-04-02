@@ -1,15 +1,18 @@
 using Microsoft.EntityFrameworkCore;
+using RoadMap.Data.Configurations;
+using RoadMap.Domain.Models.Roadmaps;
 using RoadMap.Models.Social;
 using RoadMap.Models.Users;
 
 namespace RoadMap.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(RoadmapNodeConfiguration).Assembly);
     }
-
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<Subscription> Subscriptions { get; set; }
@@ -17,4 +20,11 @@ public class AppDbContext : DbContext
 
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Like> Likes { get; set; }
+    
+    public DbSet<Node> Nodes { get; set; }
+    public DbSet<NodeDependency> NodeDependencies { get; set; }
+    public DbSet<NodeResource> NodeResources { get; set; }
+    public DbSet<Resource> Resources { get; set; }
+    public DbSet<Roadmap> Roadmaps { get; set; }
+    public DbSet<RoadmapNode> RoadmapNodes { get; set; }
 }
