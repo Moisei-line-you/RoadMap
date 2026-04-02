@@ -9,4 +9,6 @@ public interface IUserRepository
     Task<User?> GetByUsernameAsync(string username);
     
     Task SaveChangesAsync();
+    
+    Task AddUserAsync(User user);
 }
