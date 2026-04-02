@@ -10,5 +10,4 @@ public interface IUserRepository
     
     Task SaveChangesAsync();
     
-    Task AddUserAsync(User user);
 }

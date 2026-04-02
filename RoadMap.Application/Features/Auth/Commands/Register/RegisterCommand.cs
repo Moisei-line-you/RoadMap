@@ -9,16 +9,16 @@ public record RegisterCommand (string Username, string Email, string Password) :
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Unit>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IRepository _repository;
 
-    public RegisterCommandHandler(IUserRepository userRepository)
+    public RegisterCommandHandler(IRepository repository)
     {
-        _userRepository = userRepository;
+        _repository = repository;
     }
 
     public async Task<Unit> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        if (await _userRepository.EmailExistsAsync(request.Email))
+        if (await _repository.Users.EmailExistsAsync(request.Email))
         {
             throw new EmailAlreadyExistsException();
         }
@@ -31,8 +31,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Unit>
             RoleId = 1
         };
 
-        await _userRepository.AddUserAsync(newUser);
-        await _userRepository.SaveChangesAsync();
+        await _repository.AddAsync(newUser);
+        await _repository.SaveChangesAsync();
         
         return Unit.Value;
     }
