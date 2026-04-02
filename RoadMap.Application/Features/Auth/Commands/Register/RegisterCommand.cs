@@ -1,14 +1,13 @@
 using MediatR;
 using RoadMap.Application.Exceptions;
 using RoadMap.Domain.Interfaces;
-using RoadMap.Infrastructure.Repositories;
 using RoadMap.Models.Users;
 
 namespace RoadMap.Application.Features.Auth.Commands.Register;
 
-public record RegisterCommand (string Username, string Email, string Password) : IRequest;
+public record RegisterCommand (string Username, string Email, string Password) : IRequest<Unit>;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand>
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Unit>
 {
     private readonly IUserRepository _userRepository;
 
@@ -17,7 +16,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand>
         _userRepository = userRepository;
     }
 
-    public async Task Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         if (await _userRepository.EmailExistsAsync(request.Email))
         {
@@ -34,5 +33,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand>
 
         await _userRepository.AddUserAsync(newUser);
         await _userRepository.SaveChangesAsync();
+        
+        return Unit.Value;
     }
 }

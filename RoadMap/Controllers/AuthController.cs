@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RoadMap.Application.DTOs.Auth;
 using RoadMap.Application.Exceptions;
 using RoadMap.Application.Features.Auth.Commands.Register;
 using RoadMap.Application.Features.Auth.Queries.Login;

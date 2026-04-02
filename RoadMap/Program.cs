@@ -1,6 +1,6 @@
-using MediatR;
 using System.Text;
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -31,10 +31,14 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddValidatorsFromAssembly(typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly);
 
 builder.Services.AddMediatR(cfg => 
+{
     cfg.RegisterServicesFromAssemblies(
         typeof(Program).Assembly, 
         typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly
-    ));
+    );
+    
+    cfg.AddOpenBehavior(typeof(RoadMap.Application.Common.Behaviors.ValidationBehavior<,>));
+});
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -79,6 +83,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 var app = builder.Build();
 
+app.UseMiddleware<RoadMap.Middleware.ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
