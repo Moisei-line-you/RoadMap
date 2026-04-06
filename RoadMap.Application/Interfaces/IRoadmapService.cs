@@ -8,7 +8,7 @@ namespace RoadMap.Application.Interfaces;
 public interface IRoadmapService
 {
     Task<RoadmapDto> GetRoadmapAsync(int id);
-    public Task AddNodeToRoadmapAsync(int roadmapId, int nodeId, double x, double y);
-    Task<IEnumerable<NodeSummaryDto>> GetAvailableNodesAsync(int roadmapId, List<int> completedNodeIds);
-    public Task<Roadmap> CreateRoadmap(RoadmapService.CreateRoadmapRequest request);
+    public Task AddNodeToRoadmapAsync(AddNodeToRoadmapRequest request);
+    Task<IEnumerable<NodeSummaryDto>> GetAvailableNodesAsync(GetAvailableNodesRequest request);
+    public Task<RoadmapDto> CreateRoadmap(CreateRoadmapRequest request);
 }

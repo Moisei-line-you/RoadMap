@@ -27,59 +27,61 @@ public class RoadmapService : IRoadmapService
             roadmap.Description,
             roadmap.Nodes.Select(rn => new RoadmapNodeDto(
                 rn.NodeId,
-                rn.Node?.Title ?? string.Empty,
                 rn.PositionX,
                 rn.PositionY
             )).ToList()
         );
     }
 
-    public async Task AddNodeToRoadmapAsync(int roadmapId, int nodeId, double x, double y)
+    public async Task AddNodeToRoadmapAsync(AddNodeToRoadmapRequest request)
     {
-        var roadmap = await _repository.Roadmaps.GetWithNodesAsync(roadmapId)
-                      ?? throw new NotFoundException("Roadmap", roadmapId);
+        var roadmap = await _repository.Roadmaps.GetWithNodesAsync(request.RoadmapId)
+                      ?? throw new NotFoundException("Roadmap", request.RoadmapId);
 
-        roadmap.AddNode(nodeId, x, y);
+        roadmap.AddNode(request.NodeId, request.X, request.Y);
 
         await _repository.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<NodeSummaryDto>> GetAvailableNodesAsync(
-        int roadmapId, 
-        List<int> completedNodeIds)
+    public async Task<IEnumerable<NodeSummaryDto>> GetAvailableNodesAsync(GetAvailableNodesRequest request)
     {
-        var roadmap = await _repository.Roadmaps.GetWithNodesAsync(roadmapId)
-                      ?? throw new NotFoundException("Roadmap", roadmapId);
+        var roadmap = await _repository.Roadmaps.GetWithNodesAsync(request.RoadmapId)
+                      ?? throw new NotFoundException("Roadmap", request.RoadmapId);
 
-        var nodeIds = roadmap.Nodes.Select(rn => rn.NodeId).ToList();
-        var nodes = await _repository.Nodes.GetByIdsWithDependenciesAsync(nodeIds);
-        var completed = completedNodeIds.ToHashSet();
-
-        return nodes
-            .Where(n => n.IsAvailable(completed))
+        var availableNodes = roadmap.Nodes
+            .Where(n => !request.CompletedNodeIds.Contains(n.NodeId))
             .Select(n => new NodeSummaryDto(
-                n.Id,
-                n.Title,
-                n.Description,
-                n.Difficulty,
-                n.IsOptional,
-                n.DependsOn.Select(d => d.ToNodeId).ToList()
+                n.NodeId,
+                n.Node.Title,
+                n.Node.Description,
+                n.Node.Difficulty,
+                n.Node.IsOptional,
+                n.DependsOn?.Select(d => d.ToNodeId).ToList() ?? new List<int>()
             ));
+        
+        return availableNodes;
     }
 
-    public async Task<Roadmap> CreateRoadmap(CreateRoadmapRequest request)
+    public async Task<RoadmapDto> CreateRoadmap(CreateRoadmapRequest request)
     {
         var roadmap = new Roadmap
         {
             Title = request.Title,
-            Description = request.Description
+            Description = request.Description,
         };
 
         await _repository.AddAsync(roadmap);
         await _repository.SaveChangesAsync();
-
-        return roadmap;
+        
+        return new RoadmapDto(
+            roadmap.Id,
+            roadmap.Title,
+            roadmap.Description,
+            roadmap.Nodes.Select(n => new RoadmapNodeDto(
+                n.NodeId,
+                n.PositionX,
+                n.PositionY
+            )).ToList()
+        );
     }
-    
-    public record CreateRoadmapRequest(string Title, string Description);
 }

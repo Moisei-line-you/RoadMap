@@ -9,7 +9,22 @@ public record RoadmapDto(
 
 public record RoadmapNodeDto(
     int NodeId,
-    string NodeTitle,
     double PositionX,
     double PositionY
 );
+
+public record AddNodeToRoadmapRequest(
+    int RoadmapId,
+    int NodeId,
+    double X,
+    double Y
+);
+
+public record GetAvailableNodesRequest(
+    int RoadmapId,
+    List<int> CompletedNodeIds
+);
+
+public record CreateRoadmapRequest(
+    string Title,
+    string Description);

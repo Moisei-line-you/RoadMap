@@ -21,6 +21,30 @@ public class NotFoundException : Exception
         : base($"{entity} with id '{key}' was not found") { }
 }
 
+public class BadRequestException : Exception
+{
+    public BadRequestException() 
+        : base("Bad request") { }
+    
+    public BadRequestException(string message) 
+        : base(message) { }
+
+    public BadRequestException(string message, Exception innerException) 
+        : base(message, innerException) { }
+}
+
+public class ConflictException : Exception
+{
+    public ConflictException() 
+        : base("Conflict occurred") { }
+
+    public ConflictException(string message) 
+        : base(message) { }
+
+    public ConflictException(string message, Exception innerException) 
+        : base(message, innerException) { }
+}
+
 public class BusinessException : Exception
 {
     public BusinessException(string message) : base(message) { }

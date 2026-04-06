@@ -19,10 +19,10 @@ public class Node
     public NodeDependency AddDependency(Node target, DependencyType type)
     {
         if (Id == target.Id)
-            throw new DomainException("Self dependency");
+            throw new DomainException("Node cannot depend on itself");
 
         if (DependsOn.Any(d => d.ToNodeId == target.Id))
-            throw new DomainException("Already exists");
+            throw new DomainException("Dependency already exists");
 
         var dependency = new NodeDependency
         {

@@ -35,9 +35,6 @@ builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
 builder.Services.AddScoped<INodeService, NodeService>();
 builder.Services.AddScoped<IRoadmapService, RoadmapService>();
 builder.Services.AddScoped<IDependencyGraphService, DependencyGraphService>();
-builder.Services.AddScoped<INodeRepository, NodeRepository>();
-builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
-builder.Services.AddScoped<IRepository, Repository>();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -90,6 +87,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 

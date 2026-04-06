@@ -1,5 +1,5 @@
-﻿using RoadMap.Application.Interfaces;
-using RoadMap.Domain.Enums;
+﻿using RoadMap.Application.DTOs.Nodes;
+using RoadMap.Application.Interfaces;
 using RoadMap.Domain.Exceptions;
 using RoadMap.Domain.Interfaces;
 using RoadMap.Domain.Models.Roadmaps;
@@ -17,54 +17,55 @@ public class NodeService : INodeService
         _graphService = graphService;
     }
 
-    public async Task<Node> GetFullNodeAsync(int id)
+    public async Task<NodeDto> GetFullNodeAsync(int id)
     {
-        return await _repository.Nodes.GetFullInfoAsync(id)
-               ?? throw new NotFoundException("Node", id);
+        var node = await _repository.Nodes.GetFullInfoAsync(id)
+                   ?? throw new NotFoundException("Node", id);
+
+        return new NodeDto(
+            node.Id,
+            node.Title,
+            node.Description
+        );
     }
 
-    public async Task AddDependencyAsync(int fromNodeId, int toNodeId, DependencyType type)
+    public async Task AddDependencyAsync(AddDependencyRequest request)
     {
-        var fromNode = await _repository.Nodes.GetFullInfoAsync(fromNodeId)
-                       ?? throw new NotFoundException("Node", fromNodeId);
+        var fromNode = await _repository.Nodes.GetFullInfoAsync(request.FromNodeId)
+                       ?? throw new NotFoundException("Node", request.FromNodeId);
 
-        var toNode = await _repository.Nodes.GetAsync(toNodeId)
-                     ?? throw new NotFoundException("Node", toNodeId);
+        var toNode = await _repository.Nodes.GetAsync(request.ToNodeId)
+                     ?? throw new NotFoundException("Node", request.ToNodeId);
 
-        var nodes = await _repository.Nodes.GetAllAsync();
-        if (_graphService.HasCycle(nodes, fromNodeId, toNodeId))
+        var nodes = await _repository.Nodes.GetAllWithDependenciesAsync();
+        if (_graphService.HasCycle(nodes, request.FromNodeId, request.ToNodeId))
             throw new BusinessException("Dependency creates a cycle");
 
-        var dependency = fromNode.AddDependency(toNode, type);
+        var dependency = fromNode.AddDependency(toNode, request.Type);
         _repository.Nodes.AddDependency(dependency);
 
         await _repository.SaveChangesAsync();
     }
 
-    public async Task AddResourceAsync(int nodeId, int resourceId)
+    public async Task AddResourceAsync(AddResourceRequest request)
     {
-        var node = await _repository.Nodes.GetFullInfoAsync(nodeId)
-                   ?? throw new NotFoundException("Node", nodeId);
+        var node = await _repository.Nodes.GetFullInfoAsync(request.NodeId)
+                   ?? throw new NotFoundException("Node", request.NodeId);
 
-        node.AddResource(resourceId);
+        node.AddResource(request.ResourceId);
 
         await _repository.SaveChangesAsync();
     }
     
-    public async Task<int> CreateNodeAsync(
-        string title,
-        string description,
-        NodeType type,
-        int difficulty,
-        bool isOptional)
+    public async Task<int> CreateNodeAsync(CreateNodeRequest request)
     {
         var node = new Node
         {
-            Title = title,
-            Description = description,
-            Type = type,
-            Difficulty = difficulty,
-            IsOptional = isOptional
+            Title = request.Title,
+            Description = request.Description,
+            Type = request.Type,
+            Difficulty = request.Difficulty,
+            IsOptional = request.IsOptional
         };
 
         await _repository.AddAsync(node);

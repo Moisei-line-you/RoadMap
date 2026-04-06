@@ -11,7 +11,7 @@ public class DependencyGraphService : IDependencyGraphService
             n => n.Id,
             n => n.DependsOn.Select(d => d.ToNodeId).ToList()
         );
-        return HasPath(graph, fromNodeId, toNodeId);
+        return HasPath(graph, toNodeId, fromNodeId);
     }
 
     private bool HasPath(Dictionary<int, List<int>> graph, int current, int target, HashSet<int>? visited = null)

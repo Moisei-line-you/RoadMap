@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using RoadMap.Application.DTOs.Nodes;
 using RoadMap.Application.Interfaces;
-using RoadMap.Domain.Enums;
 
 namespace RoadMap.Controllers;
 
@@ -14,7 +14,7 @@ public class NodesController : ControllerBase
     {
         _nodeService = nodeService;
     }
-    
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetNode(int id)
     {
@@ -25,37 +25,24 @@ public class NodesController : ControllerBase
     [HttpPost("{id:int}/dependencies")]
     public async Task<IActionResult> AddDependency(int id, [FromBody] AddDependencyRequest request)
     {
-        await _nodeService.AddDependencyAsync(id, request.ToNodeId, request.Type);
+        var dto = request with { FromNodeId = id };
+        await _nodeService.AddDependencyAsync(dto);
         return NoContent();
     }
 
     [HttpPost("{id:int}/resources")]
     public async Task<IActionResult> AddResource(int id, [FromBody] AddResourceRequest request)
     {
-        await _nodeService.AddResourceAsync(id, request.ResourceId);
+        var dto = request with { NodeId = id };
+        await _nodeService.AddResourceAsync(dto);
         return NoContent();
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> CreateNode([FromBody] CreateNodeRequest request)
     {
-        var id = await _nodeService.CreateNodeAsync(
-            request.Title,
-            request.Description,
-            request.Type,
-            request.Difficulty,
-            request.IsOptional);
+        var id = await _nodeService.CreateNodeAsync(request);
 
         return CreatedAtAction(nameof(GetNode), new { id }, new { id });
     }
-
-    public record CreateNodeRequest(
-        string Title,
-        string Description,
-        NodeType Type,
-        int Difficulty,
-        bool IsOptional);
 }
-
-public record AddDependencyRequest(int ToNodeId, DependencyType Type);
-public record AddResourceRequest(int ResourceId);

@@ -1,12 +1,11 @@
-﻿using RoadMap.Domain.Enums;
-using RoadMap.Domain.Models.Roadmaps;
+﻿using RoadMap.Application.DTOs.Nodes;
 
 namespace RoadMap.Application.Interfaces;
 
 public interface INodeService
 {
-    Task<Node> GetFullNodeAsync(int id);
-    Task<int> CreateNodeAsync(string title, string description, NodeType type, int difficulty, bool isOptional);
-    Task AddDependencyAsync(int fromNodeId, int toNodeId, DependencyType type);
-    Task AddResourceAsync(int nodeId, int resourceId);
+    Task<NodeDto> GetFullNodeAsync(int id);
+    Task<int> CreateNodeAsync(CreateNodeRequest request);
+    Task AddDependencyAsync(AddDependencyRequest request);
+    Task AddResourceAsync(AddResourceRequest request);
 }

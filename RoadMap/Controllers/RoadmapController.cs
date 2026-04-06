@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RoadMap.Application.DTOs.Roadmaps;
 using RoadMap.Application.Interfaces;
-using RoadMap.Application.Services;
 
 namespace RoadMap.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RoadmapsController : ControllerBase
+public class RoadmapController : ControllerBase
 {
     private readonly IRoadmapService _roadmapService;
 
-    public RoadmapsController(IRoadmapService roadmapService)
+    public RoadmapController(IRoadmapService roadmapService)
     {
         _roadmapService = roadmapService;
     }
@@ -23,9 +23,10 @@ public class RoadmapsController : ControllerBase
     }
     
     [HttpPost("{id:int}/nodes")]
-    public async Task<IActionResult> AddNode(int id, [FromBody] AddNodeRequest request)
+    public async Task<IActionResult> AddNode(int id, [FromBody] AddNodeToRoadmapRequest request)
     {
-        await _roadmapService.AddNodeToRoadmapAsync(id, request.NodeId, request.X, request.Y);
+        var dto = request with { RoadmapId = id };
+        await _roadmapService.AddNodeToRoadmapAsync(dto);
         return NoContent();
     }
     
@@ -34,18 +35,31 @@ public class RoadmapsController : ControllerBase
         int id,
         [FromQuery] List<int> completedNodeIds)
     {
-        var nodes = await _roadmapService.GetAvailableNodesAsync(id, completedNodeIds);
+        var dto = new GetAvailableNodesRequest(id, completedNodeIds);
+        var nodes = await _roadmapService.GetAvailableNodesAsync(dto);
         return Ok(nodes);
     }
     
     [HttpPost]
-    public async Task<IActionResult> CreateRoadmap([FromBody] RoadmapService.CreateRoadmapRequest request)
+    public async Task<IActionResult> CreateRoadmap([FromBody] CreateRoadmapRequest request)
     {
+        var serviceRequest = new CreateRoadmapRequest(
+            request.Title,
+            request.Description);
         
-        var roadmap = await _roadmapService.CreateRoadmap(request);
+        var roadmap = await _roadmapService.CreateRoadmap(serviceRequest);
         
-        return CreatedAtAction(nameof(GetRoadmap), new { id = roadmap.Id }, roadmap);
+        var dto = new RoadmapDto(
+            roadmap.Id,
+            roadmap.Title,
+            roadmap.Description,
+            roadmap.Nodes.Select(n => new RoadmapNodeDto(
+                n.NodeId,
+                n.PositionX,
+                n.PositionY
+            )).ToList()
+        );
+        
+        return CreatedAtAction(nameof(GetRoadmap), new { id = roadmap.Id }, dto);
     }
 }
-
-public record AddNodeRequest(int NodeId, double X, double Y);

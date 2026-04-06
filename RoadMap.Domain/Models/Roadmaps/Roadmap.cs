@@ -12,7 +12,7 @@ public class Roadmap
     public void AddNode(int nodeId, double x, double y)
     {
         if (Nodes.Any(n => n.NodeId == nodeId))
-            throw new DomainException("Already exists");
+            throw new DomainException($"Node with id {nodeId} already exists in this roadmap.");
 
         Nodes.Add(new RoadmapNode
         {
