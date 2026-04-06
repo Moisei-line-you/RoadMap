@@ -43,23 +43,8 @@ public class RoadmapController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateRoadmap([FromBody] CreateRoadmapRequest request)
     {
-        var serviceRequest = new CreateRoadmapRequest(
-            request.Title,
-            request.Description);
+        var roadmapDto = await _roadmapService.CreateRoadmap(request);
         
-        var roadmap = await _roadmapService.CreateRoadmap(serviceRequest);
-        
-        var dto = new RoadmapDto(
-            roadmap.Id,
-            roadmap.Title,
-            roadmap.Description,
-            roadmap.Nodes.Select(n => new RoadmapNodeDto(
-                n.NodeId,
-                n.PositionX,
-                n.PositionY
-            )).ToList()
-        );
-        
-        return CreatedAtAction(nameof(GetRoadmap), new { id = roadmap.Id }, dto);
+        return CreatedAtAction(nameof(GetRoadmap), new { id = roadmapDto.Id }, roadmapDto);
     }
 }
