@@ -1,7 +1,7 @@
 using MediatR;
 using RoadMap.Application.DTOs.Auth;
-using RoadMap.Application.Exceptions;
 using RoadMap.Application.Interfaces;
+using RoadMap.Domain.Exceptions;
 using RoadMap.Domain.Interfaces;
 
 namespace RoadMap.Application.Features.Auth.Queries.Login;

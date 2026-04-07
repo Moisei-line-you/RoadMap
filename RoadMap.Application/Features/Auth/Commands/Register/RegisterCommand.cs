@@ -1,5 +1,5 @@
 using MediatR;
-using RoadMap.Application.Exceptions;
+using RoadMap.Domain.Exceptions;
 using RoadMap.Domain.Interfaces;
 using RoadMap.Models.Users;
 
