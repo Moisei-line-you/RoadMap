@@ -20,11 +20,25 @@ public class NodeRepository(AppDbContext context) : INodeRepository
             .Include(n => n.RequiredFor)
             .FirstOrDefaultAsync(n => n.Id == id);
     }
-
-    // Работа с промежуточными таблицами напрямую
+    
     public void AddDependency(NodeDependency dependency) => context.NodeDependencies.Add(dependency);
     
     public void RemoveDependency(NodeDependency dependency) => context.NodeDependencies.Remove(dependency);
 
     public void AddResourceLink(NodeResource nodeResource) => context.NodeResources.Add(nodeResource);
+    
+    public async Task<List<Node>> GetByIdsWithDependenciesAsync(List<int> ids)
+    {
+        return await context.Nodes
+            .Where(n => ids.Contains(n.Id))
+            .Include(n => n.DependsOn)
+            .ToListAsync();
+    }
+    
+    public async Task<List<Node>> GetAllWithDependenciesAsync()
+    {
+        return await context.Nodes
+            .Include(n => n.DependsOn)
+            .ToListAsync();
+    }
 }

@@ -5,6 +5,7 @@ public interface IRepository
     IRoadmapRepository Roadmaps { get; }
     INodeRepository Nodes { get; }
     IUserRepository Users { get; }
+    IResourceRepository Resources { get; }
     Task<int> SaveChangesAsync();
     
     Task AddAsync<TEntity>(TEntity entity)

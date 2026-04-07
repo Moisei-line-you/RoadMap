@@ -9,6 +9,7 @@ using RoadMap.Application.Options;
 using RoadMap.Application.Services;
 using RoadMap.Data;
 using RoadMap.Domain.Interfaces;
+using RoadMap.Domain.Services;
 using RoadMap.Infrastucture.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,8 +23,11 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+builder.Services.AddScoped<INodeRepository, NodeRepository>();
+builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
+builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
+builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly);
@@ -41,6 +45,10 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddScoped<INodeRepository, NodeRepository>();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
+builder.Services.AddScoped<INodeService, NodeService>();
+builder.Services.AddScoped<IRoadmapService, RoadmapService>();
+builder.Services.AddScoped<IResourceService, ResourceService>();
+builder.Services.AddScoped<IDependencyGraphService, DependencyGraphService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -87,17 +95,7 @@ var app = builder.Build();
 
 app.UseMiddleware<RoadMap.Middleware.ExceptionHandlingMiddleware>();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -112,5 +110,17 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"Ошибка при автоматической миграции: {ex.Message}");
     }    
 }
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();

@@ -11,4 +11,6 @@ public interface INodeRepository
     void AddResourceLink(NodeResource nodeResource);
     Task<Node?> GetAsync(int id);
     Task<IEnumerable<Node>> GetAllAsync();
+    public Task<List<Node>> GetByIdsWithDependenciesAsync(List<int> ids);
+    public Task<List<Node>> GetAllWithDependenciesAsync();
 }

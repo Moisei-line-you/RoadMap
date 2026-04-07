@@ -16,6 +16,7 @@ public class RoadmapRepository(AppDbContext context) : IRoadmapRepository
         return await context.Roadmaps
             .Include(r => r.Nodes)
             .ThenInclude(rn => rn.Node)
+            .AsSplitQuery()            
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 
