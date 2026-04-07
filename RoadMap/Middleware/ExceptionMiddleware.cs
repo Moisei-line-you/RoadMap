@@ -3,10 +3,12 @@ using RoadMap.Domain.Exceptions;
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionMiddleware> _logger;
 
-    public ExceptionMiddleware(RequestDelegate next)
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task Invoke(HttpContext context)
@@ -17,26 +19,25 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
+            if (ex is not (NotFoundException or BusinessException or DomainException))
+                _logger.LogError(ex, "Unhandled exception for {Method} {Path}",
+                    context.Request.Method, context.Request.Path);
+
             context.Response.ContentType = "application/json";
 
-            switch (ex)
+            context.Response.StatusCode = ex switch
             {
-                case NotFoundException:
-                    context.Response.StatusCode = StatusCodes.Status404NotFound;
-                    break;
-                case BusinessException:
-                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                    break;
-                case DomainException:
-                    context.Response.StatusCode = StatusCodes.Status409Conflict;
-                    break;
-                default:
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    break;
-            }
+                NotFoundException  => StatusCodes.Status404NotFound,
+                BusinessException  => StatusCodes.Status400BadRequest,
+                DomainException    => StatusCodes.Status409Conflict,
+                _                  => StatusCodes.Status500InternalServerError
+            };
 
-            var response = new { message = ex.Message };
-            await context.Response.WriteAsJsonAsync(response);
+            var message = ex is not (NotFoundException or BusinessException or DomainException)
+                ? "An unexpected error occurred"
+                : ex.Message;
+
+            await context.Response.WriteAsJsonAsync(new { message });
         }
     }
 }

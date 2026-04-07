@@ -1,4 +1,6 @@
-﻿namespace RoadMap.Application.DTOs.Roadmaps;
+﻿using RoadMap.Domain.Enums;
+
+namespace RoadMap.Application.DTOs.Roadmaps;
 
 public record RoadmapDto(
     int Id,
@@ -13,6 +15,14 @@ public record RoadmapNodeDto(
     double PositionY
 );
 
+public record ResourceDto(
+    int Id,
+    string Title,
+    string Url,
+    ResourceType Type,
+    bool IsFree
+);
+
 public record AddNodeToRoadmapRequest(
     int RoadmapId,
     int NodeId,
@@ -23,6 +33,13 @@ public record AddNodeToRoadmapRequest(
 public record GetAvailableNodesRequest(
     int RoadmapId,
     List<int> CompletedNodeIds
+);
+
+public record CreateResourceRequest(
+    string Title,
+    string Url,
+    ResourceType Type,
+    bool IsFree
 );
 
 public record CreateRoadmapRequest(

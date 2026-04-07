@@ -23,17 +23,16 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+builder.Services.AddScoped<INodeRepository, NodeRepository>();
+builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
+builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
+builder.Services.AddScoped<IRepository, Repository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-
 builder.Services.AddScoped<ITokenService, TokenService>();
-
-builder.Services.AddScoped<INodeRepository, NodeRepository>();
-builder.Services.AddScoped<IRepository, Repository>();
-builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
-
 builder.Services.AddScoped<INodeService, NodeService>();
 builder.Services.AddScoped<IRoadmapService, RoadmapService>();
+builder.Services.AddScoped<IResourceService, ResourceService>();
 builder.Services.AddScoped<IDependencyGraphService, DependencyGraphService>();
 
 builder.Services.AddSwaggerGen(c =>
@@ -82,20 +81,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
-app.UseMiddleware<ExceptionMiddleware>();
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -110,5 +96,17 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"Ошибка при автоматической миграции: {ex.Message}");
     }    
 }
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();

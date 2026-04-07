@@ -7,12 +7,14 @@ public class Repository(
     AppDbContext context, 
     IRoadmapRepository roadmaps,
     INodeRepository nodes,
-    IUserRepository users)
+    IUserRepository users,
+    IResourceRepository resources)
     : IRepository
 {
     public IRoadmapRepository Roadmaps { get; } = roadmaps;
     public INodeRepository Nodes { get; } = nodes;
     public IUserRepository Users { get; } = users;
+    public IResourceRepository Resources { get; } = resources;
 
     public async Task<int> SaveChangesAsync()
     {
