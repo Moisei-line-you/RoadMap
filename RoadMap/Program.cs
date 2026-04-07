@@ -1,4 +1,5 @@
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -29,7 +30,24 @@ builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
 builder.Services.AddScoped<IRepository, Repository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddValidatorsFromAssembly(typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly);
+
+builder.Services.AddMediatR(cfg => 
+{
+    cfg.RegisterServicesFromAssemblies(
+        typeof(Program).Assembly, 
+        typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly
+    );
+    
+    cfg.AddOpenBehavior(typeof(RoadMap.Application.Common.Behaviors.ValidationBehavior<,>));
+});
+
+builder.Services.AddScoped<INodeRepository, NodeRepository>();
+builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
 builder.Services.AddScoped<INodeService, NodeService>();
 builder.Services.AddScoped<IRoadmapService, RoadmapService>();
 builder.Services.AddScoped<IResourceService, ResourceService>();
@@ -58,9 +76,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -80,6 +95,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<RoadMap.Middleware.ExceptionHandlingMiddleware>();
 
 
 
