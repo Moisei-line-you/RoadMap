@@ -47,7 +47,6 @@ builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
 builder.Services.AddScoped<INodeService, NodeService>();
 builder.Services.AddScoped<IRoadmapService, RoadmapService>();
-builder.Services.AddScoped<IResourceService, ResourceService>();
 builder.Services.AddScoped<IDependencyGraphService, DependencyGraphService>();
 
 builder.Services.AddSwaggerGen(c =>
