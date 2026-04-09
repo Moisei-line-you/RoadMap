@@ -8,7 +8,7 @@ using RoadMap.Domain.Services;
 
 namespace RoadMap.Application; 
 
-public static class DependencyInjection
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
@@ -19,11 +19,11 @@ public static class DependencyInjection
         services.AddScoped<IResourceService, ResourceService>();
         services.AddScoped<IDependencyGraphService, DependencyGraphService>();
         
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
 
         services.AddMediatR(cfg => 
         {
-            cfg.RegisterServicesFromAssemblies(typeof(DependencyInjection).Assembly);
+            cfg.RegisterServicesFromAssemblies(typeof(ServiceCollectionExtensions).Assembly);
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 

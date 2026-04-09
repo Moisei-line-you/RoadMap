@@ -7,7 +7,7 @@ using RoadMap.Infrastucture.Data.Repositories;
 
 namespace RoadMap.Infrastucture;
 
-public static class DependencyInjection
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
         IConfiguration configuration)
