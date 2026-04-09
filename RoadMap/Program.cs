@@ -1,115 +1,32 @@
-using System.Text;
-using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using RoadMap.Application.Interfaces;
-using RoadMap.Application.Options;
-using RoadMap.Application.Services;
+using RoadMap.Application;
 using RoadMap.Data;
-using RoadMap.Domain.Interfaces;
-using RoadMap.Domain.Services;
-using RoadMap.Infrastucture.Data.Repositories;
+using RoadMap.Extensions;
+using RoadMap.Infrastucture;
+using RoadMap.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddControllers();
-
-builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
-
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddScoped<IUserRepository, UserRepository>(); 
-builder.Services.AddScoped<INodeRepository, NodeRepository>();
-builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
-builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
-builder.Services.AddScoped<IRepository, Repository>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-
-builder.Services.AddValidatorsFromAssembly(typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly);
-
-builder.Services.AddMediatR(cfg => 
-{
-    cfg.RegisterServicesFromAssemblies(
-        typeof(Program).Assembly, 
-        typeof(RoadMap.Application.Features.Auth.Commands.Register.RegisterCommand).Assembly
-    );
-    
-    cfg.AddOpenBehavior(typeof(RoadMap.Application.Common.Behaviors.ValidationBehavior<,>));
-});
-
-builder.Services.AddScoped<INodeRepository, NodeRepository>();
-builder.Services.AddScoped<IRepository, Repository>();
-builder.Services.AddScoped<IRoadmapRepository, RoadmapRepository>();
-builder.Services.AddScoped<INodeService, NodeService>();
-builder.Services.AddScoped<IRoadmapService, RoadmapService>();
-builder.Services.AddScoped<IResourceService, ResourceService>();
-builder.Services.AddScoped<IDependencyGraphService, DependencyGraphService>();
-
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description ="Token",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-    });
-    
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            new string[] { }
-        }
-    });
-});
-
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-
-        ValidateLifetime = true,
-
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
-    };
-});
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddWebServices(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseMiddleware<RoadMap.Middleware.ExceptionHandlingMiddleware>();
-
-
-
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        var context = services.GetRequiredService<AppDbContext>();
         context.Database.Migrate();
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Ошибка при автоматической миграции: {ex.Message}");
+        Console.WriteLine($"Auto migration error {ex.Message}");
     }    
 }
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -117,10 +34,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
