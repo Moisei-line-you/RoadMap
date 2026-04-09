@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using RoadMap.Application.Common.Behaviors;
+using RoadMap.Application.Features.Auth.Commands.Register;
 using RoadMap.Application.Interfaces;
 using RoadMap.Application.Services;
 using RoadMap.Domain.Interfaces;
@@ -19,11 +20,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IResourceService, ResourceService>();
         services.AddScoped<IDependencyGraphService, DependencyGraphService>();
         
-        services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
+        services.AddValidatorsFromAssembly(typeof(RegisterCommand).Assembly);
 
         services.AddMediatR(cfg => 
         {
-            cfg.RegisterServicesFromAssemblies(typeof(ServiceCollectionExtensions).Assembly);
+            cfg.RegisterServicesFromAssemblies(typeof(RegisterCommand).Assembly);
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
