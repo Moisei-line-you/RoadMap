@@ -1,24 +1,37 @@
 ﻿using MediatR;
-using RoadMap.Application.Common.Results;
 using RoadMap.Application.DTOs.Roadmaps;
-using RoadMap.Application.Interfaces;
+using RoadMap.Domain.Interfaces;
+using RoadMap.Domain.Models.Roadmaps;
 
 namespace RoadMap.Application.Features.Roadmaps.Commands;
 
-public record CreateRoadmapCommand(CreateRoadmapRequest Request) : IRequest<Result<RoadmapDto>>;
+public record CreateRoadmapCommand(CreateRoadmapRequest Request) : IRequest<RoadmapDto>;
 
-public class CreateRoadmapHandler : IRequestHandler<CreateRoadmapCommand, Result<RoadmapDto>>
+public class CreateRoadmapHandler : IRequestHandler<CreateRoadmapCommand, RoadmapDto>
 {
-    private readonly IRoadmapService _roadmapService;
+    private readonly IRepository _repository;
 
-    public CreateRoadmapHandler(IRoadmapService roadmapService)
+    public CreateRoadmapHandler(IRepository repository)
     {
-        _roadmapService = roadmapService;
+        _repository = repository;
     }
 
-    public async Task<Result<RoadmapDto>> Handle(CreateRoadmapCommand request, CancellationToken cancellationToken)
+    public async Task<RoadmapDto> Handle(CreateRoadmapCommand request, CancellationToken cancellationToken)
     {
-        var roadmapDto = await _roadmapService.CreateRoadmap(request.Request);
-        return Result<RoadmapDto>.Success(roadmapDto);
+        var roadmap = new Roadmap
+        {
+            Title = request.Request.Title,
+            Description = request.Request.Description,
+        };
+
+        await _repository.AddAsync(roadmap);
+        await _repository.SaveChangesAsync();
+
+        return new RoadmapDto(
+            roadmap.Id,
+            roadmap.Title,
+            roadmap.Description,
+            new List<RoadmapNodeDto>()
+        );
     }
 }

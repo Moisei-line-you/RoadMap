@@ -1,5 +1,16 @@
 namespace RoadMap.Domain.Exceptions;
 
+public abstract class AppException : Exception
+{
+    public int StatusCode { get; }
+
+    protected AppException(string message, int statusCode)
+        : base(message)
+    {
+        StatusCode = statusCode;
+    }
+}
+
 public class DomainException : Exception
 {
     public DomainException(string message) : base(message) { }
@@ -15,37 +26,26 @@ public class InvalidCredentialsException : DomainException
     public InvalidCredentialsException() : base("Invalid username or password") { }
 }
 
-public class NotFoundException : Exception
+public class NotFoundException : AppException
 {
     public NotFoundException(string entity, object key)
-        : base($"{entity} with id '{key}' was not found") { }
+        : base($"{entity} with id '{key}' was not found", 404) { }
 }
 
-public class BadRequestException : Exception
+public class BadRequestException : AppException
 {
-    public BadRequestException() 
-        : base("Bad request") { }
-    
-    public BadRequestException(string message) 
-        : base(message) { }
-
-    public BadRequestException(string message, Exception innerException) 
-        : base(message, innerException) { }
+    public BadRequestException(string message)
+        : base(message, 400) { }
 }
 
-public class ConflictException : Exception
+public class ConflictException : AppException
 {
-    public ConflictException() 
-        : base("Conflict occurred") { }
-
-    public ConflictException(string message) 
-        : base(message) { }
-
-    public ConflictException(string message, Exception innerException) 
-        : base(message, innerException) { }
+    public ConflictException(string message)
+        : base(message, 409) { }
 }
 
-public class BusinessException : Exception
+public class BusinessException : AppException
 {
-    public BusinessException(string message) : base(message) { }
+    public BusinessException(string message)
+        : base(message, 400) { }
 }

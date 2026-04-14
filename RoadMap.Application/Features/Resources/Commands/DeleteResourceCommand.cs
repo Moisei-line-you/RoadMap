@@ -1,12 +1,12 @@
 ﻿using MediatR;
-using RoadMap.Application.Common.Results;
+using RoadMap.Domain.Exceptions;
 using RoadMap.Domain.Interfaces;
 
 namespace RoadMap.Application.Features.Resources.Queries;
 
-public record DeleteResourceCommand(int Id) : IRequest<Result<Unit>>;
+public record DeleteResourceCommand(int Id) : IRequest<Unit>;
 
-public class DeleteResourceHandler : IRequestHandler<DeleteResourceCommand, Result<Unit>>
+public class DeleteResourceHandler : IRequestHandler<DeleteResourceCommand, Unit>
 {
     private readonly IRepository _repository;
 
@@ -15,16 +15,16 @@ public class DeleteResourceHandler : IRequestHandler<DeleteResourceCommand, Resu
         _repository = repository;
     }
 
-    public async Task<Result<Unit>> Handle(DeleteResourceCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(DeleteResourceCommand request, CancellationToken cancellationToken)
     {
         var resource = await _repository.Resources.GetAsync(request.Id);
 
         if (resource == null)
-            return Result<Unit>.Failure("Resource not found");
+            throw new NotFoundException("Resource", request.Id);
 
-        await _repository.Resources.DeleteAsync(request.Id);
+        _repository.Delete(resource);
         await _repository.SaveChangesAsync();
 
-        return Result<Unit>.Success(Unit.Value);
+        return Unit.Value;
     }
 }

@@ -1,24 +1,36 @@
 ﻿using MediatR;
-using RoadMap.Application.Common.Results;
 using RoadMap.Application.DTOs.Roadmaps;
-using RoadMap.Application.Interfaces;
+using RoadMap.Domain.Exceptions;
+using RoadMap.Domain.Interfaces;
 
 namespace RoadMap.Application.Features.Roadmaps.Commands;
 
-public record AssignNodeToRoadmapCommand(AddNodeToRoadmapRequest Request) : IRequest<Result<Unit>>;
+public record AssignNodeToRoadmapCommand(AddNodeToRoadmapRequest Request) : IRequest<Unit>;
 
-public class AssignNodeToRoadmapHandler : IRequestHandler<AssignNodeToRoadmapCommand, Result<Unit>>
+public class AssignNodeToRoadmapHandler : IRequestHandler<AssignNodeToRoadmapCommand, Unit>
 {
-    private readonly IRoadmapService _roadmapService;
+    private readonly IRepository _repository;
 
-    public AssignNodeToRoadmapHandler(IRoadmapService roadmapService)
+    public AssignNodeToRoadmapHandler(IRepository repository)
     {
-        _roadmapService = roadmapService;
+        _repository = repository;
     }
 
-    public async Task<Result<Unit>> Handle(AssignNodeToRoadmapCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AssignNodeToRoadmapCommand request, CancellationToken cancellationToken)
     {
-        await _roadmapService.AddNodeToRoadmapAsync(request.Request);
-        return Result<Unit>.Success(Unit.Value);
+        var roadmap = await _repository.Roadmaps.GetWithNodesAsync(request.Request.RoadmapId);
+
+        if (roadmap == null)
+            throw new NotFoundException("Roadmap", request.Request.RoadmapId);
+
+        roadmap.AddNode(
+            request.Request.NodeId,
+            request.Request.X,
+            request.Request.Y
+        );
+
+        await _repository.SaveChangesAsync();
+
+        return Unit.Value;
     }
 }

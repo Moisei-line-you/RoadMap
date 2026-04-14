@@ -15,9 +15,6 @@ public static class ServiceCollectionExtensions
     {
         
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<INodeService, NodeService>();
-        services.AddScoped<IRoadmapService, RoadmapService>();
-        services.AddScoped<IResourceService, ResourceService>();
         services.AddScoped<IDependencyGraphService, DependencyGraphService>();
         
         services.AddValidatorsFromAssembly(typeof(RegisterCommand).Assembly);

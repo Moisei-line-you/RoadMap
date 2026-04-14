@@ -20,37 +20,29 @@ public class ResourcesController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var result = await _mediator.Send(new GetResourceByIdQuery(id));
-        if (!result.IsSuccess)
-            return NotFound(result.Error);
-
-        return Ok(result.Value);
+        var resource = await _mediator.Send(new GetResourceByIdQuery(id));
+        return Ok(resource);
     }
-
+    
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _mediator.Send(new GetAllResourcesQuery());
-        return Ok(result.Value);
+        var resources = await _mediator.Send(new GetAllResourcesQuery());
+        return Ok(resources);
     }
-
+    
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateResourceRequest request)
     {
-        var result = await _mediator.Send(new CreateResourceCommand(request));
-        if (!result.IsSuccess)
-            return BadRequest(result.Error);
+        var id = await _mediator.Send(new CreateResourceCommand(request));
 
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, new { id = result.Value });
+        return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
-
+    
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _mediator.Send(new DeleteResourceCommand(id));
-        if (!result.IsSuccess)
-            return NotFound(result.Error);
-
+        await _mediator.Send(new DeleteResourceCommand(id));
         return NoContent();
     }
 }

@@ -1,32 +1,43 @@
 ﻿using MediatR;
-using RoadMap.Application.Common.Results;
 using RoadMap.Application.DTOs.Nodes;
-using RoadMap.Application.Interfaces;
+using RoadMap.Domain.Exceptions;
+using RoadMap.Domain.Interfaces;
 
 namespace RoadMap.Application.Features.Roadmaps.Queries;
 
 public record GetAvailableNodesQuery(
     int RoadmapId,
     List<int> CompletedNodeIds
-) : IRequest<Result<IEnumerable<NodeSummaryDto>>>;
+) : IRequest<IEnumerable<NodeSummaryDto>>;
 
 public class GetAvailableNodesHandler 
-    : IRequestHandler<GetAvailableNodesQuery, Result<IEnumerable<NodeSummaryDto>>>
+    : IRequestHandler<GetAvailableNodesQuery, IEnumerable<NodeSummaryDto>>
 {
-    private readonly IRoadmapService _roadmapService;
+    private readonly IRepository _repository;
 
-    public GetAvailableNodesHandler(IRoadmapService roadmapService)
+    public GetAvailableNodesHandler(IRepository repository)
     {
-        _roadmapService = roadmapService;
+        _repository = repository;
     }
 
-    public async Task<Result<IEnumerable<NodeSummaryDto>>> Handle(
+    public async Task<IEnumerable<NodeSummaryDto>> Handle(
         GetAvailableNodesQuery request,
         CancellationToken cancellationToken)
     {
-        var nodes = await _roadmapService.GetAvailableNodesAsync(
-            new GetAvailableNodesRequest(request.RoadmapId, request.CompletedNodeIds));
+        var roadmap = await _repository.Roadmaps.GetWithNodesAsync(request.RoadmapId);
 
-        return Result<IEnumerable<NodeSummaryDto>>.Success(nodes);
+        if (roadmap == null)
+            throw new NotFoundException("Roadmap", request.RoadmapId);
+
+        return roadmap.Nodes
+            .Where(n => !request.CompletedNodeIds.Contains(n.NodeId))
+            .Select(n => new NodeSummaryDto(
+                n.NodeId,
+                n.Node.Title,
+                n.Node.Description,
+                n.Node.Difficulty,
+                n.Node.IsOptional,
+                n.DependsOn?.Select(d => d.ToNodeId).ToList() ?? new List<int>()
+            ));
     }
 }
