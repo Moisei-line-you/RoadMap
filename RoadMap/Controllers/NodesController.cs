@@ -1,6 +1,8 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RoadMap.Application.DTOs.Nodes;
-using RoadMap.Application.Interfaces;
+using RoadMap.Application.Features.Nodes.Commands;
+using RoadMap.Application.Features.Nodes.Queries;
 
 namespace RoadMap.Controllers;
 
@@ -8,40 +10,44 @@ namespace RoadMap.Controllers;
 [Route("api/[controller]")]
 public class NodesController : ControllerBase
 {
-    private readonly INodeService _nodeService;
+    private readonly IMediator _mediator;
 
-    public NodesController(INodeService nodeService)
+    public NodesController(IMediator mediator)
     {
-        _nodeService = nodeService;
+        _mediator = mediator;
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetNode(int id)
     {
-        var node = await _nodeService.GetFullNodeAsync(id);
+        var node = await _mediator.Send(new GetNodeQuery(id));
         return Ok(node);
     }
 
     [HttpPost("{id:int}/dependencies")]
     public async Task<IActionResult> AddDependency(int id, [FromBody] AddDependencyRequest request)
     {
-        var dto = request with { FromNodeId = id };
-        await _nodeService.AddDependencyAsync(dto);
+        var command = request with { FromNodeId = id };
+
+        await _mediator.Send(new AddDependencyCommand(command));
+
         return NoContent();
     }
 
     [HttpPost("{id:int}/resources")]
     public async Task<IActionResult> AddResource(int id, [FromBody] AddResourceRequest request)
     {
-        var dto = request with { NodeId = id };
-        await _nodeService.AddResourceAsync(dto);
+        var command = request with { NodeId = id };
+
+        await _mediator.Send(new AddResourceCommand(command));
+
         return NoContent();
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateNode([FromBody] CreateNodeRequest request)
     {
-        var id = await _nodeService.CreateNodeAsync(request);
+        var id = await _mediator.Send(new CreateNodeCommand(request));
 
         return CreatedAtAction(nameof(GetNode), new { id }, new { id });
     }

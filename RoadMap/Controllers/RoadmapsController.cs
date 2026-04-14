@@ -1,6 +1,8 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using RoadMap.Application.DTOs.Roadmaps;
-using RoadMap.Application.Interfaces;
+using RoadMap.Application.Features.Roadmaps.Commands;
+using RoadMap.Application.Features.Roadmaps.Queries;
 
 namespace RoadMap.Controllers;
 
@@ -8,42 +10,46 @@ namespace RoadMap.Controllers;
 [Route("api/[controller]")]
 public class RoadmapsController : ControllerBase
 {
-    private readonly IRoadmapService _roadmapService;
+    private readonly IMediator _mediator;
 
-    public RoadmapsController(IRoadmapService roadmapService)
+    public RoadmapsController(IMediator mediator)
     {
-        _roadmapService = roadmapService;
+        _mediator = mediator;
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetRoadmap(int id)
     {
-        var roadmap = await _roadmapService.GetRoadmapAsync(id);
+        var roadmap = await _mediator.Send(new GetRoadmapQuery(id));
         return Ok(roadmap);
-    }
-    
-    [HttpPost("{id:int}/node-assignments")]
-    public async Task<IActionResult> AssignNode(int id, [FromBody] AddNodeToRoadmapRequest request)
-    {
-        var dto = request with { RoadmapId = id };
-        await _roadmapService.AddNodeToRoadmapAsync(dto);
-        return NoContent();
     }
 
     [HttpGet("{id:int}/available-nodes")]
-    public async Task<IActionResult> GetAvailableNodes(
-        int id,
-        [FromQuery] List<int> completedNodeIds)
+    public async Task<IActionResult> GetAvailableNodes(int id, [FromQuery] List<int> completedNodeIds)
     {
-        var dto = new GetAvailableNodesRequest(id, completedNodeIds);
-        var nodes = await _roadmapService.GetAvailableNodesAsync(dto);
+        var nodes = await _mediator.Send(new GetAvailableNodesQuery(id, completedNodeIds));
         return Ok(nodes);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateRoadmap([FromBody] CreateRoadmapRequest request)
     {
-        var roadmapDto = await _roadmapService.CreateRoadmap(request);
-        return CreatedAtAction(nameof(GetRoadmap), new { id = roadmapDto.Id }, roadmapDto);
+        var roadmap = await _mediator.Send(new CreateRoadmapCommand(request));
+
+        return CreatedAtAction(
+            nameof(GetRoadmap),
+            new { id = roadmap.Id },
+            roadmap
+        );
+    }
+    
+    [HttpPost("{id:int}/node-assignments")]
+    public async Task<IActionResult> AssignNode(int id, [FromBody] AddNodeToRoadmapRequest request)
+    {
+        var command = request with { RoadmapId = id };
+
+        await _mediator.Send(new AssignNodeToRoadmapCommand(command));
+
+        return NoContent();
     }
 }
