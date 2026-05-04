@@ -7,7 +7,4 @@ public interface IUserRepository
     Task<bool> EmailExistsAsync(string email);
     
     Task<User?> GetByUsernameAsync(string username);
-    
-    Task SaveChangesAsync();
-    
 }

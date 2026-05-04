@@ -17,16 +17,4 @@ public class ResourceRepository(AppDbContext context) : IResourceRepository
     
     public async Task<bool> ExistsAsync(int id)
         => await context.Resources.AnyAsync(r => r.Id == id);
-
-    public async Task AddAsync(Resource resource)
-    {
-        await context.Resources.AddAsync(resource);
-    }
-
-    public async Task DeleteAsync(int id)
-    {
-        var resource = await context.Resources.FirstOrDefaultAsync(r => r.Id == id);
-        if (resource != null)
-            context.Resources.Remove(resource);
-    }
 }

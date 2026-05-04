@@ -17,6 +17,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Role> Roles { get; set; }
     public DbSet<Subscription> Subscriptions { get; set; }
     public DbSet<ActivityLog> ActivityLogs { get; set; }
+    public DbSet<UserNodeProgress> UserNodeProgresses { get; set; }
 
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Like> Likes { get; set; }

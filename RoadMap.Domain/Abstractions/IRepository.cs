@@ -6,6 +6,7 @@ public interface IRepository
     INodeRepository Nodes { get; }
     IUserRepository Users { get; }
     IResourceRepository Resources { get; }
+    IProgressRepository Progress { get; }
     Task<int> SaveChangesAsync();
     
     Task AddAsync<TEntity>(TEntity entity)
