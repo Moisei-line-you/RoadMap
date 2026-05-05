@@ -30,4 +30,12 @@ public class ProgressRepository(AppDbContext context) : IProgressRepository
                         p.RoadmapId == roadmapId)
             .ToListAsync();
     }
+    public async Task<UserNodeProgress?> GetAsyncProgress(int userId, int nodeId, int roadmapId)
+    {
+        return await context.UserNodeProgresses
+            .FirstOrDefaultAsync(p =>
+                p.UserId == userId &&
+                p.NodeId == nodeId &&
+                p.RoadmapId == roadmapId);
+    }
 }

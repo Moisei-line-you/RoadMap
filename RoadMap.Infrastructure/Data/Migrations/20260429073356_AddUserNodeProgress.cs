@@ -18,7 +18,7 @@ namespace RoadMap.Infrastucture.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
                     NodeId = table.Column<int>(type: "integer", nullable: false),
                     RoadmapId = table.Column<int>(type: "integer", nullable: false),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)

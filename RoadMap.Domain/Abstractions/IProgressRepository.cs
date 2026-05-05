@@ -8,4 +8,5 @@ public interface IProgressRepository
     
     Task<List<UserNodeProgress>> GetProgressAsync(int userId, int roadmapId);
     
+    Task<UserNodeProgress?> GetAsyncProgress(int userId, int nodeId, int roadmapId);
 }
