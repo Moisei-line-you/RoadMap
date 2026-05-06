@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RoadMap.Data;
+using RoadMap.Domain.Interfaces;
 using RoadMap.Models.Users;
 
 namespace RoadMap.Infrastucture.Data.Repositories;
@@ -27,8 +28,7 @@ public class ProgressRepository(AppDbContext context) : IProgressRepository
     {
         return await context.UserNodeProgresses
             .Where(p => p.UserId == userId &&
-                        p.RoadmapId == roadmapId && 
-                        p.NodeId == userId)
+                        p.RoadmapId == roadmapId)
             .ToListAsync();
     }
     

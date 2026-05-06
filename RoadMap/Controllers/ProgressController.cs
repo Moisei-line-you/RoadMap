@@ -19,30 +19,44 @@ public class ProgressController : ControllerBase
         _mediator = mediator;
     }
 
-    private int GetCurrentUserId()
+    private bool TryGetCurrentUserId(out int userId)
     {
+        userId = default;
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        return int.Parse(claim!.Value);
+        return claim is not null && int.TryParse(claim.Value, out userId);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetProgress(int roadmapId)
     {
-        var result = await _mediator.Send(new GetProgressQuery(GetCurrentUserId(), roadmapId));
+        if (!TryGetCurrentUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _mediator.Send(new GetProgressQuery(userId, roadmapId));
         return Ok(result);
     }
 
     [HttpPost("nodes/{nodeId:int}")]
     public async Task<IActionResult> MarkComplete(int roadmapId, int nodeId)
     {
-        await _mediator.Send(new MarkNodeCompleteCommand(GetCurrentUserId(), nodeId, roadmapId));
+        if (!TryGetCurrentUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+        await _mediator.Send(new MarkNodeCompleteCommand(userId, roadmapId, nodeId));
         return NoContent();
     }
 
     [HttpDelete("nodes/{nodeId:int}")]
     public async Task<IActionResult> UnmarkComplete(int roadmapId, int nodeId)
     {
-        await _mediator.Send(new UnmarkNodeCompleteCommand(GetCurrentUserId(), roadmapId, nodeId));
+        if (!TryGetCurrentUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+        await _mediator.Send(new UnmarkNodeCompleteCommand(userId, roadmapId, nodeId));
         return NoContent();
     }
 }
