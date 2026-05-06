@@ -1,5 +1,7 @@
 using RoadMap.Models.Users;
 
+namespace RoadMap.Domain.Interfaces;
+
 public interface IProgressRepository
 {
     Task<List<int>> GetCompletedNodeIdsAsync(int userId, int roadmapId);

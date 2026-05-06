@@ -27,6 +27,12 @@ namespace RoadMap.Infrastucture.Data.Migrations
                 {
                     table.PrimaryKey("PK_UserNodeProgresses", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserNodeProgresses_UserId_RoadmapId_NodeId",
+                table: "UserNodeProgresses",
+                columns: new[] { "UserId", "RoadmapId", "NodeId" },
+                unique: true);
         }
 
         /// <inheritdoc />
