@@ -20,7 +20,7 @@ public class GetProgressHandler : IRequestHandler<GetProgressQuery, RoadmapProgr
     {
         var roadmap = await _repository.Roadmaps.GetWithNodesAsync(request.RoadMapId);
         if (roadmap == null)
-            throw new NotFoundException(nameof(RoadMap), request.RoadMapId);
+            throw new NotFoundException("Roadmap", request.RoadMapId);
       
         var progressRecord = await _repository.Progress.GetProgressAsync(request.UserId, request.RoadMapId);
 
