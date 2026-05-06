@@ -320,11 +320,13 @@ namespace RoadMap.Infrastucture.Data.Migrations
                     b.Property<int>("RoadmapId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId", "RoadmapId", "NodeId")
+                        .IsUnique();
 
                     b.ToTable("UserNodeProgresses");
                 });
