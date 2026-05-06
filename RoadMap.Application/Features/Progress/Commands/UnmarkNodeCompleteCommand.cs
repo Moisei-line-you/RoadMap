@@ -20,7 +20,7 @@ public class UnmarkNodeCompleteHandler : IRequestHandler<UnmarkNodeCompleteComma
 
     public async Task<Unit> Handle(UnmarkNodeCompleteCommand request, CancellationToken cancellationToken)
     {
-        var progress = await _repository.Progress.GetAsyncProgress(
+        var progress = await _repository.Progress.GetAsync(
             request.UserId,
             request.NodeId,
             request.RoadmapId);

@@ -6,7 +6,7 @@ public interface IProgressRepository
     
     Task<bool> IsNodeCompletedAsync(int userId, int nodeId, int roadmapId);
     
-    Task<List<UserNodeProgress>> GetProgressAsync(int userId, int roadmapId);
+    Task<List<UserNodeProgress>> GetAsync(int userId, int roadmapId);
     
-    Task<UserNodeProgress?> GetAsyncProgress(int userId, int nodeId, int roadmapId);
+    Task<UserNodeProgress?> GetAsync(int userId, int nodeId, int roadmapId);
 }

@@ -11,7 +11,7 @@ namespace RoadMap.Controllers;
 [ApiController]
 [Route("api/roadmap/{roadmapId:int}/progress")]
 
-public class ProgressController : ControllerBase
+public class ProgressController : ControllerBase    
 {
     private readonly IMediator _mediator;
     public ProgressController(IMediator mediator)

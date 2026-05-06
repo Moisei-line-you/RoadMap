@@ -23,14 +23,16 @@ public class ProgressRepository(AppDbContext context) : IProgressRepository
                            p.RoadmapId == roadmapId);
     }
     
-    public async Task<List<UserNodeProgress>> GetProgressAsync(int userId, int roadmapId)
+    public async Task<List<UserNodeProgress>> GetAsync(int userId, int roadmapId)
     {
         return await context.UserNodeProgresses
             .Where(p => p.UserId == userId &&
-                        p.RoadmapId == roadmapId)
+                        p.RoadmapId == roadmapId && 
+                        p.NodeId == userId)
             .ToListAsync();
     }
-    public async Task<UserNodeProgress?> GetAsyncProgress(int userId, int nodeId, int roadmapId)
+    
+    public async Task<UserNodeProgress?> GetAsync(int userId, int nodeId, int roadmapId)
     {
         return await context.UserNodeProgresses
             .FirstOrDefaultAsync(p =>

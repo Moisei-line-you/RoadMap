@@ -22,7 +22,7 @@ public class GetProgressHandler : IRequestHandler<GetProgressQuery, RoadmapProgr
         if (roadmap == null)
             throw new NotFoundException(nameof(RoadMap), request.RoadMapId);
       
-        var progressRecord = await _repository.Progress.GetProgressAsync(request.UserId, request.RoadMapId);
+        var progressRecord = await _repository.Progress.GetAsync(request.UserId, request.RoadMapId);
 
         var completedNodes = progressRecord
             .Select(p => new CompletedNodeDto(
