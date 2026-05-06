@@ -9,7 +9,7 @@ namespace RoadMap.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/roadmap/{roadmapId:int}/progress")]
+[Route("api/roadmaps/{roadmapId:int}/progress")]
 
 public class ProgressController : ControllerBase
 {
