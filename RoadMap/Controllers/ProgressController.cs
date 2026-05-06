@@ -42,7 +42,7 @@ public class ProgressController : ControllerBase
     [HttpDelete("nodes/{nodeId:int}")]
     public async Task<IActionResult> UnmarkComplete(int roadmapId, int nodeId)
     {
-        await _mediator.Send(new UnmarkNodeCompleteCommand(GetCurrentUserId(), nodeId, roadmapId));
+        await _mediator.Send(new UnmarkNodeCompleteCommand(GetCurrentUserId(), roadmapId, nodeId));
         return NoContent();
     }
 }
