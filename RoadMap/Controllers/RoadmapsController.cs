@@ -17,6 +17,14 @@ public class RoadmapsController : ControllerBase
         _mediator = mediator;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetRoadmaps()
+    {
+        var roadmaps = await _mediator.Send(new GetAllRoadmapsQuery());
+
+        return Ok(roadmaps);
+    }
+    
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetRoadmap(int id)
     {

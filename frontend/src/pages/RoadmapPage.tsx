@@ -6,8 +6,8 @@ import { getProgress, markNodeComplete, unmarkNodeComplete } from '../api/progre
 import NodeCard from '../components/NodeCard';
 
 export default function RoadmapPage() {
-  const { roadmapId } = useParams();
-  const id = Number(roadmapId);
+  const { id } = useParams();
+  const roadmapId = Number(id);
 
   const [roadmap, setRoadmap] = useState<any>(null);
   const [completedNodeIds, setCompletedNodeIds] = useState<number[]>([]);
@@ -24,8 +24,8 @@ export default function RoadmapPage() {
         setError(null);
 
         const [roadmapRes, progressRes] = await Promise.all([
-          getRoadmap(id),
-          getProgress(id),
+          getRoadmap(roadmapId),
+          getProgress(roadmapId),
         ]);
 
         setRoadmap(roadmapRes);
@@ -45,12 +45,12 @@ export default function RoadmapPage() {
       const isCompleted = completedNodeIds.includes(nodeId);
 
       if (isCompleted) {
-        await unmarkNodeComplete(id, nodeId);
+        await unmarkNodeComplete(roadmapId, nodeId);
         setCompletedNodeIds((prev) =>
           prev.filter((id) => id !== nodeId)
         );
       } else {
-        await markNodeComplete(id, nodeId);
+        await markNodeComplete(roadmapId, nodeId);
         setCompletedNodeIds((prev) => [...prev, nodeId]);
       }
     } catch (err) {
