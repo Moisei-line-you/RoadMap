@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RoadMap.Application.DTOs.Roadmaps;
 using RoadMap.Application.Features.Roadmaps.Commands;
@@ -32,6 +33,7 @@ public class RoadmapsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "WriteAccess")]
     public async Task<IActionResult> CreateRoadmap([FromBody] CreateRoadmapRequest request)
     {
         var roadmap = await _mediator.Send(new CreateRoadmapCommand(request));
@@ -44,6 +46,7 @@ public class RoadmapsController : ControllerBase
     }
     
     [HttpPost("{id:int}/node-assignments")]
+    [Authorize(Policy = "WriteAccess")]
     public async Task<IActionResult> AssignNode(int id, [FromBody] AddNodeToRoadmapRequest request)
     {
         var command = request with { RoadmapId = id };

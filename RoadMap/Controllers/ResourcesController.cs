@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RoadMap.Application.DTOs.Resources;
 using RoadMap.Application.Features.Resources.Queries;
@@ -32,6 +33,7 @@ public class ResourcesController : ControllerBase
     }
     
     [HttpPost]
+    [Authorize(Policy = "WriteAccess")]
     public async Task<IActionResult> Create([FromBody] CreateResourceRequest request)
     {
         var id = await _mediator.Send(new CreateResourceCommand(request));
@@ -40,6 +42,7 @@ public class ResourcesController : ControllerBase
     }
     
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "WriteAccess")]
     public async Task<IActionResult> Delete(int id)
     {
         await _mediator.Send(new DeleteResourceCommand(id));

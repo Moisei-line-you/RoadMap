@@ -1,3 +1,4 @@
+using FluentValidation;
 using RoadMap.Domain.Exceptions;
 
 namespace RoadMap.Middleware;
@@ -37,6 +38,39 @@ public class GlobalExceptionMiddleware
             {
                 message = appEx.Message,
                 status = appEx.StatusCode,
+                traceId = context.TraceIdentifier
+            });
+
+            return;
+        }
+
+        if (ex is ValidationException validationException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+            await context.Response.WriteAsJsonAsync(new
+            {
+                message = "Validation failed",
+                status = StatusCodes.Status400BadRequest,
+                errors = validationException.Errors.Select(e => new
+                {
+                    field = e.PropertyName,
+                    error = e.ErrorMessage
+                }),
+                traceId = context.TraceIdentifier
+            });
+
+            return;
+        }
+
+        if (ex is DomainException domainException)
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+
+            await context.Response.WriteAsJsonAsync(new
+            {
+                message = domainException.Message,
+                status = StatusCodes.Status409Conflict,
                 traceId = context.TraceIdentifier
             });
 

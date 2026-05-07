@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RoadMap.Application.DTOs.Nodes;
 using RoadMap.Application.Features.Nodes.Commands;
@@ -25,6 +26,7 @@ public class NodesController : ControllerBase
     }
 
     [HttpPost("{id:int}/dependencies")]
+    [Authorize(Policy = "WriteAccess")]
     public async Task<IActionResult> AddDependency(int id, [FromBody] AddDependencyRequest request)
     {
         var command = request with { FromNodeId = id };
@@ -35,6 +37,7 @@ public class NodesController : ControllerBase
     }
 
     [HttpPost("{id:int}/resources")]
+    [Authorize(Policy = "WriteAccess")]
     public async Task<IActionResult> AddResource(int id, [FromBody] AddResourceRequest request)
     {
         var command = request with { NodeId = id };
@@ -45,6 +48,7 @@ public class NodesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "WriteAccess")]
     public async Task<IActionResult> CreateNode([FromBody] CreateNodeRequest request)
     {
         var id = await _mediator.Send(new CreateNodeCommand(request));
