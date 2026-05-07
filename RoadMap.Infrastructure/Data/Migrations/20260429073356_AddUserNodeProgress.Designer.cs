@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RoadMap.Data;
 
 #nullable disable
 
-namespace RoadMap.Data.Migrations
+namespace RoadMap.Infrastucture.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260429073356_AddUserNodeProgress")]
+    partial class AddUserNodeProgress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,11 +325,8 @@ namespace RoadMap.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NodeId");
-
-                    b.HasIndex("RoadmapId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "RoadmapId", "NodeId")
+                        .IsUnique();
 
                     b.ToTable("UserNodeProgresses");
                 });
@@ -390,33 +390,6 @@ namespace RoadMap.Data.Migrations
                     b.Navigation("Node");
 
                     b.Navigation("Roadmap");
-                });
-
-            modelBuilder.Entity("RoadMap.Models.Users.UserNodeProgress", b =>
-                {
-                    b.HasOne("RoadMap.Domain.Models.Roadmaps.Node", "Node")
-                        .WithMany()
-                        .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RoadMap.Domain.Models.Roadmaps.Roadmap", "Roadmap")
-                        .WithMany()
-                        .HasForeignKey("RoadmapId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RoadMap.Models.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Node");
-
-                    b.Navigation("Roadmap");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RoadMap.Domain.Models.Roadmaps.Node", b =>

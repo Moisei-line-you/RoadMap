@@ -8,13 +8,15 @@ public class Repository(
     IRoadmapRepository roadmaps,
     INodeRepository nodes,
     IUserRepository users,
-    IResourceRepository resources)
+    IResourceRepository resources,
+    IProgressRepository progress)
     : IRepository
 {
     public IRoadmapRepository Roadmaps { get; } = roadmaps;
     public INodeRepository Nodes { get; } = nodes;
     public IUserRepository Users { get; } = users;
     public IResourceRepository Resources { get; } = resources;
+    public IProgressRepository Progress { get; } = progress;
 
     public async Task<int> SaveChangesAsync()
     {

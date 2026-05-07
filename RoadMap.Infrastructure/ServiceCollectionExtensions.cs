@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INodeRepository, NodeRepository>();
         services.AddScoped<IRoadmapRepository, RoadmapRepository>();
         services.AddScoped<IResourceRepository, ResourceRepository>();
+        services.AddScoped<IProgressRepository, ProgressRepository>();
 
         return services;
     }
