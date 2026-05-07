@@ -1,4 +1,5 @@
 using MediatR;
+using RoadMap.Domain.Exceptions;
 using RoadMap.Domain.Interfaces;
 
 namespace RoadMap.Application.Features.Progress.Commands;
@@ -25,9 +26,10 @@ public class UnmarkNodeCompleteHandler : IRequestHandler<UnmarkNodeCompleteComma
             request.NodeId,
             request.RoadmapId);
 
-        if (progress != null)
-            _repository.Delete(progress);
-
+        if (progress == null)
+            throw new NotFoundException("Progress", request.NodeId);
+        
+        _repository.Delete(progress);
         await _repository.SaveChangesAsync();
         
         return Unit.Value;

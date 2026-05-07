@@ -56,7 +56,7 @@ public class ProgressController : ControllerBase
         {
             return Unauthorized();
         }
-        await _mediator.Send(new UnmarkNodeCompleteCommand(userId, nodeId, roadmapId));
+        await _mediator.Send(new UnmarkNodeCompleteCommand(userId,roadmapId, nodeId));
         return NoContent();
     }
 }

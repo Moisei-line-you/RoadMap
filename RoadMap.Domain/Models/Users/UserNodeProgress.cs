@@ -15,6 +15,6 @@ public class UserNodeProgress
     public int RoadmapId { get; set; }
     public Roadmap? Roadmap { get; set; }
 
-    public DateTime CompletedAt { get; set; }
+    public DateTime CompletedAt { get; set; } = DateTime.UtcNow;
 }
  

@@ -27,8 +27,10 @@ public class ProgressRepository(AppDbContext context) : IProgressRepository
     public async Task<List<UserNodeProgress>> GetAsync(int userId, int roadmapId)
     {
         return await context.UserNodeProgresses
+            .Include(p => p.Node)
             .Where(p => p.UserId == userId &&
                         p.RoadmapId == roadmapId)
+            .OrderBy(p => p.CompletedAt)
             .ToListAsync();
     }
     

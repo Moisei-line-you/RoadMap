@@ -27,7 +27,7 @@ public class GetProgressHandler : IRequestHandler<GetProgressQuery, RoadmapProgr
         var completedNodes = progressRecord
             .Select(p => new CompletedNodeDto(
                 NodeId: p.NodeId,
-                NodeTitle: p.Node?.Title ?? roadmap.Nodes.FirstOrDefault(n => n.NodeId == p.NodeId)?.Node?.Title ?? "Unknown",
+                NodeTitle: p.Node?.Title ?? "Unknown",
                 CompletedAt: p.CompletedAt
             ))
             .ToList();
